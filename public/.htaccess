@@ -13,13 +13,27 @@
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect Trailing Slashes If Not A Folder
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # React CMS Routing (Browser History)
+    # Semua URL yang dimulai /cms dan bukan file/folder → arahkan ke index.php
+    RewriteCond %{REQUEST_URI} ^/cms
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ /index.php [L]
+
+    # Laravel API / Blade Routing
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+
 </IfModule>
+
+# Proteksi file sensitif
+<FilesMatch "\.(env|json|lock|config)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
